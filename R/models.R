@@ -61,15 +61,15 @@ add_model <- function(label,
   )
 }
 
-add_model("gill_09_harmonicity",
-          "Gill & Purves (2009)",
-          "Periodicity/harmonicity",
-          "bowl18",
-          consonance = TRUE,
-          spectrum_sensitive = FALSE,
-          continuous_pitch = FALSE,
-          f = function(x, num_harmonics, roll_off, ...)
-            bowl18::gill09_harmonicity(x, ...))
+# add_model("gill_09_harmonicity",
+#           "Gill & Purves (2009)",
+#           "Periodicity/harmonicity",
+#           "bowl18",
+#           consonance = TRUE,
+#           spectrum_sensitive = FALSE,
+#           continuous_pitch = FALSE,
+#           f = function(x, num_harmonics, roll_off, ...)
+#             bowl18::gill09_harmonicity(x, ...))
 
 add_model("har_18_harmonicity",
           "Harrison & Pearce (2018)",
