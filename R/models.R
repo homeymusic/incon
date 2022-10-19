@@ -264,5 +264,25 @@ add_model("har_19_composite",
                              roll_off = roll_off,
                              ...))
 
+add_model("euler_1739_gradus_suavitatis",
+          "Euler (1739)",
+          "Periodicity/harmonicity",
+          "incon",
+          consonance = FALSE,
+          spectrum_sensitive = FALSE,
+          continuous_pitch = TRUE,
+          f = function(x, num_harmonics, roll_off, ...)
+            euler_1739_gradus_suavitatis(x, ...))
+
+add_model("vogel_1976_modified_euler",
+          "Vogel (1976)",
+          "Periodicity/harmonicity",
+          "incon",
+          consonance = FALSE,
+          spectrum_sensitive = FALSE,
+          continuous_pitch = TRUE,
+          f = function(x, num_harmonics, roll_off, ...)
+            vogel_1976_modified_euler(x, ...))
+
 incon_models <- dplyr::bind_rows(incon_models)
 stopifnot(!anyDuplicated(c("any", incon_models$label)))

@@ -1,5 +1,15 @@
-plot_x_y <- function(x,y,labels,title,xlab,ylab) {
-  png(paste0('./_plots/_png/',title,'.png'),width=1000,height=1000)
+rotate <- function(coordinates,angle) {
+  checkmate::assert_numeric(angle)
+  coordinates = t(coordinates)
+  R = tibble::frame_matrix(
+    ~chord,          ~.y,
+    cos(angle), -sin(angle),
+    sin(angle),  cos(angle)
+  )
+  (R %*% coordinates * cos(angle)) %>% zapsmall %>% t
+}
+plot_x_y <- function(x,y,labels,title,xlab,ylab,vertical_line=FALSE) {
+  png(paste ('./_plots/_png/',title,'.png'),width=1000,height=1000)
   plot(x,y,main=title,xlab=xlab,ylab=ylab)
   abline(0,1,col='lightgray')
   text(x,y,labels,pos=1)
@@ -7,7 +17,7 @@ plot_x_y <- function(x,y,labels,title,xlab,ylab) {
 
   svg(paste0('./_plots/_svg/',title,'.svg'))
   plot(x,y,main=title,xlab=xlab,ylab=ylab)
-  abline(0,1,col='lightgray')
+  if (!vertical_line) {abline(0,1,col='lightgray')} else {abline(v=0,col='lightgray')}
   text(x,y,labels,pos=1)
   dev.off()
 }
@@ -16,11 +26,13 @@ flip_dissonance_to_consonance <- function(x) {
   if (x[1]>x[2]) x else max(x)-x
 }
 test_that('tonic octave plots work for all models for core intervals',{
+  pitches = 60 + 0:12
+
   t = tibble::tibble(
-    pitch = 0:12,
-    pitch_name = c('ton','m2','M2','m3','M3','P4',
-                   'tt',
-                   'P5','m6','M6','m7','M7','oct')
+    pitch = pitches,
+    pitch_name = c('P1','m2','M2','m3','M3','P4',
+                   'TT',
+                   'P5','m6','M6','m7','M7','P8')
   )
   all_models = list_models()
   working_models = all_models[! all_models %in% c('gill_09_harmonicity',
@@ -29,13 +41,13 @@ test_that('tonic octave plots work for all models for core intervals',{
   for (model in working_models) {
     cat('.')
 
-    tonic = 0:12 %>% purrr::map_dbl(function(pitch){
-      interval = c(0,pitch)
+    tonic = pitches %>% purrr::map_dbl(function(pitch){
+      interval = c(pitches[1],pitch)
       incon(interval,model)})
     tonic=flip_dissonance_to_consonance(tonic)
 
-    octave = 0:12 %>% purrr::map_dbl(function(pitch){
-      interval = c(pitch,12)
+    octave = pitches %>% purrr::map_dbl(function(pitch){
+      interval = c(pitch,pitches[13])
       incon(interval,model)})
     octave=flip_dissonance_to_consonance(octave)
 
@@ -47,7 +59,7 @@ test_that('tonic octave plots work for all models for core intervals',{
   }
   for (model in working_models) {
     cat('.')
-    labels = paste(t$pitch_name,"\n",t$pitch)
+    labels = paste(t$pitch_name)
     tonic =  t[[paste0(model,'.tonic')]]
     octave = t[[paste0(model,'.octave')]]
     plot_x_y(x=tonic,y=octave,
@@ -56,6 +68,17 @@ test_that('tonic octave plots work for all models for core intervals',{
     plot_x_y(x=tonic,y=rev(tonic),
              labels=labels,title=paste(model,'tonic-rev_tonic'),
              xlab='tonic',ylab='rev(tonic)')
+  }
+  for (model in working_models) {
+    cat('.')
+    labels = paste(t$pitch_name)
+    tonic =  t[[paste0(model,'.tonic')]]
+    rotated = cbind(tonic,rev(tonic)) %>% rotate(pi/4)
+    brightness  = rotated[,1]
+    affinity    = rotated[,2]
+    plot_x_y(x=brightness,y=affinity,
+             labels=labels,title=paste(model,'tonic-rev_tonic rotated'),
+             xlab='brightness',ylab='affinity',vertical_line=TRUE)
   }
   expect_true(TRUE)
 })
