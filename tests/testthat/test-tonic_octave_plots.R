@@ -11,13 +11,21 @@ rotate <- function(coordinates,angle) {
 plot_x_y <- function(x,y,labels,title,xlab,ylab,vertical_line=FALSE) {
   png(paste ('./_plots/_png/',title,'.png'),width=1000,height=1000)
   plot(x,y,main=title,xlab=xlab,ylab=ylab)
-  abline(0,1,col='lightgray')
+  if (vertical_line) {
+    abline(v=0,col='lightgray')
+  } else {
+    abline(0,1,col='lightgray')
+  }
   text(x,y,labels,pos=1)
   dev.off()
 
   svg(paste0('./_plots/_svg/',title,'.svg'))
   plot(x,y,main=title,xlab=xlab,ylab=ylab)
-  if (!vertical_line) {abline(0,1,col='lightgray')} else {abline(v=0,col='lightgray')}
+  if (vertical_line) {
+    abline(v=0,col='lightgray')
+  } else {
+    abline(0,1,col='lightgray')
+  }
   text(x,y,labels,pos=1)
   dev.off()
 }
@@ -37,6 +45,7 @@ test_that('tonic octave plots work for all models for core intervals',{
   all_models = list_models()
   working_models = all_models[! all_models %in% c('gill_09_harmonicity',
                                                   'bowl_18_min_freq_dist')]
+
   cat("\nworking ")
   for (model in working_models) {
     cat('.')
@@ -76,9 +85,9 @@ test_that('tonic octave plots work for all models for core intervals',{
     rotated = cbind(tonic,rev(tonic)) %>% rotate(pi/4)
     brightness  = rotated[,1]
     affinity    = rotated[,2]
-    plot_x_y(x=brightness,y=affinity,
+    plot_x_y(vertical_line=TRUE,x=brightness,y=affinity,
              labels=labels,title=paste(model,'tonic-rev_tonic rotated'),
-             xlab='brightness',ylab='affinity',vertical_line=TRUE)
+             xlab='brightness',ylab='affinity')
   }
   expect_true(TRUE)
 })
