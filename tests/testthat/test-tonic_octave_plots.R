@@ -9,6 +9,16 @@ rotate <- function(coordinates,angle) {
   (R %*% coordinates * cos(angle)) %>% zapsmall %>% t
 }
 plot_x_y <- function(x,y,labels,title,xlab,ylab,vertical_line=FALSE) {
+  pdf(paste ('./_plots/_pdf/',title,'.pdf'))
+  plot(x,y,main=title,xlab=xlab,ylab=ylab)
+  if (vertical_line) {
+    abline(v=0,col='lightgray')
+  } else {
+    abline(0,1,col='lightgray')
+  }
+  text(x,y,labels,pos=1)
+  dev.off()
+
   png(paste ('./_plots/_png/',title,'.png'),width=1000,height=1000)
   plot(x,y,main=title,xlab=xlab,ylab=ylab)
   if (vertical_line) {
