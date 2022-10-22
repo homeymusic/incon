@@ -264,6 +264,16 @@ add_model("har_19_composite",
                              roll_off = roll_off,
                              ...))
 
+add_model("mulloy_22_primes",
+          "Mulloy (2022)",
+          "Periodicity/harmonicity",
+          "incon",
+          consonance = FALSE,
+          spectrum_sensitive = FALSE,
+          continuous_pitch = TRUE,
+          f = function(x, num_harmonics, roll_off, ...)
+            mulloy_2022_primes(x, ...))
+
 add_model("euler_1739_gradus_suavitatis",
           "Euler (1739)",
           "Periodicity/harmonicity",
