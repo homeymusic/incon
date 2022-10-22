@@ -60,25 +60,34 @@ test_that('tonic octave plots work for all models for core intervals',{
   for (model in working_models) {
     cat('.')
 
-    tonic = pitches %>% purrr::map_dbl(function(pitch){
+    tonic_dissonance = pitches %>% purrr::map_dbl(function(pitch){
       interval = c(pitches[1],pitch)
       incon(interval,model)})
-    tonic=flip_dissonance_to_consonance(tonic)
+    tonic=flip_dissonance_to_consonance(tonic_dissonance)
 
-    octave = pitches %>% purrr::map_dbl(function(pitch){
+    octave_dissonance = pitches %>% purrr::map_dbl(function(pitch){
       interval = c(pitch,pitches[13])
       incon(interval,model)})
-    octave=flip_dissonance_to_consonance(octave)
+    octave=flip_dissonance_to_consonance(octave_dissonance)
 
     tonic_name  = paste0(model,'.tonic')
     octave_name = paste0(model,'.octave')
+    tonic_dissonance_name  = paste0(model,'.tonic.dissonance')
+    octave_dissonance_name = paste0(model,'.octave.dissonance')
     t=tibble::add_column(t,
                          "{tonic_name}"  := tonic,
-                         "{octave_name}" := octave)
+                         "{octave_name}" := octave,
+                         "{tonic_dissonance_name}"  := tonic_dissonance,
+                         "{octave_dissonance_name}" := octave_dissonance)
   }
   for (model in working_models) {
     cat('.')
     labels = paste(t$pitch_name)
+    tonic_dissonance =  t[[paste0(model,'.tonic.dissonance')]]
+    octave_dissonance = t[[paste0(model,'.octave.dissonance')]]
+    plot_x_y(x=tonic_dissonance,y=octave_dissonance,
+             labels=labels,title=paste(model,'tonic-octave dissonance'),
+             xlab='tonic dissonance',ylab='octave dissonance')
     tonic =  t[[paste0(model,'.tonic')]]
     octave = t[[paste0(model,'.octave')]]
     plot_x_y(x=tonic,y=octave,
