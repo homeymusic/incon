@@ -38,7 +38,7 @@ Suggests:
 RoxygenNote: 6.1.1
 Remotes: 
     pmcharrison/hrep,
-    pmcharrison/bowl18,
+    homeymusic/bowl18,
     pmcharrison/corpdiss,
     pmcharrison/dycon,
     pmcharrison/har18,

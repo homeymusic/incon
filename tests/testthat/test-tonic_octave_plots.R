@@ -52,17 +52,19 @@ test_that('tonic octave plots work for all models for core intervals',{
                    'TT',
                    'P5','m6','M6','m7','M7','P8')
   )
-  all_models = list_models()
-  working_models = all_models[! all_models %in% c('gill_09_harmonicity',
-                                                  'bowl_18_min_freq_dist')]
-
+  # all_models = list_models()
+  # working_models = all_models[! all_models %in% c('gill_09_harmonicity',
+  #                                                 'bowl_18_min_freq_dist')]
+  #
+  # working_models = 'gill_09_harmonicity'
+  working_models = list_models()
   cat("\nworking ")
   for (model in working_models) {
     cat('.')
 
     tonic_dissonance = pitches %>% purrr::map_dbl(function(pitch){
       interval = c(pitches[1],pitch)
-      incon(interval,model)})
+      incon(interval,model=model)})
     tonic=flip_dissonance_to_consonance(tonic_dissonance)
 
     octave_dissonance = pitches %>% purrr::map_dbl(function(pitch){

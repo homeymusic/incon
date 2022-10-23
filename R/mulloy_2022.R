@@ -17,4 +17,3 @@ mulloy_2022_primes.pi_chord <- function(x) {
   chord = chord - root
   c(0,16,12,10,9,7,12,5,11,8,14,14,2)[chord[2]+1]
 }
-
