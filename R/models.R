@@ -242,7 +242,7 @@ add_model("parn_94_mult",
           "Parncutt & Strasburger (1994)",
           "Numerosity",
           "parn94",
-          consonance = TRUE,
+          consonance = TRUE, # TODO: should this be FALSE?
           spectrum_sensitive = TRUE,
           continuous_pitch = FALSE,
           f = function(x, num_harmonics, roll_off, ...)

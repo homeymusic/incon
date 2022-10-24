@@ -39,76 +39,56 @@ plot_x_y <- function(x,y,labels,title,xlab,ylab,vertical_line=FALSE) {
   text(x,y,labels,pos=1)
   dev.off()
 }
-flip_dissonance_to_consonance <- function(x) {
+flip <- function(x) {
   x=dplyr::coalesce(x,0)
-  if (x[1]>x[2]) x else max(x)-x
+  max(x)-x
 }
 test_that('tonic octave plots work for all models for core intervals',{
-  pitches = 60 + 0:12
+  pitches     = 60 + 0:12
+  pitch_names = c('P1','m2','M2','m3','M3','P4',
+                  'TT',
+                  'P5','m6','M6','m7','M7','P8')
 
-  t = tibble::tibble(
-    pitch = pitches,
-    pitch_name = c('P1','m2','M2','m3','M3','P4',
-                   'TT',
-                   'P5','m6','M6','m7','M7','P8')
-  )
-  # all_models = list_models()
-  # working_models = all_models[! all_models %in% c('gill_09_harmonicity',
-  #                                                 'bowl_18_min_freq_dist')]
-  #
-  # working_models = 'gill_09_harmonicity'
-  working_models = list_models()
-  cat("\nworking ")
-  for (model in working_models) {
-    cat('.')
+  # models = incon_models %>% dplyr::filter(label=='gill_09_harmonicity')
+  models = incon_models
+  for (i in 1:nrow(models)) {
+    model_label = models[[i, 'label']]
+    tonic_consonance = tonic_dissonance = octave_consonance = octave_dissonance = NULL
 
-    tonic_dissonance = pitches %>% purrr::map_dbl(function(pitch){
+    t = pitches %>% purrr::map_dbl(function(pitch){
       interval = c(pitches[1],pitch)
-      incon(interval,model=model)})
-    tonic=flip_dissonance_to_consonance(tonic_dissonance)
-
-    octave_dissonance = pitches %>% purrr::map_dbl(function(pitch){
+      incon(interval,model_label)})
+    o = pitches %>% purrr::map_dbl(function(pitch){
       interval = c(pitch,pitches[13])
-      incon(interval,model)})
-    octave=flip_dissonance_to_consonance(octave_dissonance)
+      incon(interval,model_label)})
 
-    tonic_name  = paste0(model,'.tonic')
-    octave_name = paste0(model,'.octave')
-    tonic_dissonance_name  = paste0(model,'.tonic.dissonance')
-    octave_dissonance_name = paste0(model,'.octave.dissonance')
-    t=tibble::add_column(t,
-                         "{tonic_name}"  := tonic,
-                         "{octave_name}" := octave,
-                         "{tonic_dissonance_name}"  := tonic_dissonance,
-                         "{octave_dissonance_name}" := octave_dissonance)
-  }
-  for (model in working_models) {
-    cat('.')
-    labels = paste(t$pitch_name)
-    tonic_dissonance =  t[[paste0(model,'.tonic.dissonance')]]
-    octave_dissonance = t[[paste0(model,'.octave.dissonance')]]
+    if (models[[i,'consonance']]) {
+      tonic_consonance  = t
+      tonic_dissonance  = flip(t)
+      octave_consonance = o
+      octave_dissonance = flip(o)
+    } else {
+      tonic_consonance  = flip(t)
+      tonic_dissonance  = t
+      octave_consonance = flip(o)
+      octave_dissonance = o
+    }
+
     plot_x_y(x=tonic_dissonance,y=octave_dissonance,
-             labels=labels,title=paste(model,'tonic-octave dissonance'),
+             labels=pitch_names,title=paste(model_label,'1 tonic-octave dissonance'),
              xlab='tonic dissonance',ylab='octave dissonance')
-    tonic =  t[[paste0(model,'.tonic')]]
-    octave = t[[paste0(model,'.octave')]]
-    plot_x_y(x=tonic,y=octave,
-             labels=labels,title=paste(model,'tonic-octave'),
-             xlab='tonic',ylab='octave')
-    plot_x_y(x=tonic,y=rev(tonic),
-             labels=labels,title=paste(model,'tonic-rev_tonic'),
-             xlab='tonic',ylab='rev(tonic)')
-  }
-  for (model in working_models) {
-    cat('.')
-    labels = paste(t$pitch_name)
-    tonic =  t[[paste0(model,'.tonic')]]
-    rotated = cbind(tonic,rev(tonic)) %>% rotate(pi/4)
+    plot_x_y(x=tonic_consonance,y=octave_consonance,
+             labels=pitch_names,title=paste(model_label,'2 tonic-octave consonance'),
+             xlab='tonic consonance',ylab='octave consonance')
+    plot_x_y(x=tonic_consonance,y=rev(tonic_consonance),
+             labels=pitch_names,title=paste(model_label,'3 tonic-rev(tonic) consonance'),
+             xlab='tonic consonance',ylab='rev(tonic consonance)')
+    rotated = cbind(tonic_consonance,rev(tonic_consonance)) %>% rotate(pi/4)
     brightness  = rotated[,1]
     affinity    = rotated[,2]
     plot_x_y(vertical_line=TRUE,x=brightness,y=affinity,
-             labels=labels,title=paste(model,'tonic-rev_tonic rotated'),
+             labels=pitch_names,title=paste(model_label,'4 rotated tonic-rev(tonic) consonance'),
              xlab='brightness',ylab='affinity')
+    expect_true(TRUE)
   }
-  expect_true(TRUE)
 })
