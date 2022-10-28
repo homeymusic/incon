@@ -50,6 +50,9 @@ slope <- function(rise,run) {
     rise / run
   }
 }
+angle <- function(slope) {
+  pi / 2 - atan(slope)
+}
 angle_label <- function(angle_rads) {
  angle_deg = angle_rads * 180 / pi
  trunc(angle_deg)
@@ -60,7 +63,7 @@ test_that('tonic octave plots work for all models for core intervals',{
                   'TT',
                   'P5','m6','M6','m7','M7','P8')
 
-  # models = incon_models %>% dplyr::filter(label=='bowl_18_min_freq_dist')
+  # models = incon_models %>% dplyr::filter(label=='hutch_78_roughness')
   models = incon_models
   for (i in 1:nrow(models)) {
     model_label = models[[i, 'label']]
@@ -98,29 +101,27 @@ test_that('tonic octave plots work for all models for core intervals',{
              xlab='tonic consonance',ylab='octave consonance',slope=slope)
 
     # rotated tonic-octave consonance
-    angle = atan(slope)
+    angle = angle(slope)
     rotated = cbind(tonic_consonance,octave_consonance) %>% rotate(angle)
-    brightness0 = (rotated[,1][1] + rotated[,1][13]) / 2
-    brightness0 = ifelse(is.na(brightness0),0,brightness0)
-    brightness  = rotated[,1] - brightness0
+    brightness  = rotated[,1]
     affinity    = rotated[,2]
     plot_x_y(vertical_line=TRUE,x=brightness,y=affinity,
-             labels=pitch_names,title=paste(model_label,paste0('4 rotated ', angle_label(angle), '* tonic-octave consonance')),
+             labels=pitch_names,title=paste(model_label,paste('3 rotated', angle_label(angle), 'deg tonic-octave consonance')),
              xlab='brightness',ylab='affinity',slope=slope)
 
     # tonic-rev(tonic) consonance
     slope = slope((rev(tonic_consonance)[1]+rev(tonic_consonance)[13])/2,(tonic_consonance[1] + tonic_consonance[13])/2)
     plot_x_y(x=tonic_consonance,y=rev(tonic_consonance),
-             labels=pitch_names,title=paste(model_label,'3 tonic-rev(tonic) consonance'),
+             labels=pitch_names,title=paste(model_label,'4 tonic-rev(tonic) consonance'),
              xlab='tonic consonance',ylab='rev(tonic consonance)',slope=slope)
 
     # rotated tonic-rev(tonic) consonance
-    angle = atan(slope)
+    angle = angle(slope)
     rotated = cbind(tonic_consonance,rev(tonic_consonance)) %>% rotate(angle)
     brightness  = rotated[,1]
     affinity    = rotated[,2]
     plot_x_y(vertical_line=TRUE,x=brightness,y=affinity,
-             labels=pitch_names,title=paste(model_label,paste0('4 rotated ', angle_label(angle), '* tonic-rev(tonic) consonance')),
+             labels=pitch_names,title=paste(model_label,paste('5 rotated', angle_label(angle), 'deg tonic-rev(tonic) consonance')),
              xlab='brightness',ylab='affinity',slope=slope)
     expect_true(TRUE)
   }
