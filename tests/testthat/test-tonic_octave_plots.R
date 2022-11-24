@@ -126,3 +126,9 @@ test_that('tonic octave plots work for all models for core intervals',{
     expect_true(TRUE)
   }
 })
+test_that('musical characteristics',{
+  tibble::tibble(
+    model = incon_models$label,
+    major_minor_polarity = incon_models$major_minor_polarity
+  )
+})
